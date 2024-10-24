@@ -1,204 +1,63 @@
-﻿using System;
-using System.Collections;
-namespace Triesdsa
+#include <iostream>
+#include <vector>
+#include <string>
+
+class Car
 {
-    public class Tries
+    public:
+    Car(std::string licensePlate) : licensePlate(licensePlate) { }
+
+    void checkSpeed(int speed, int speedLimit)
     {
-        private class Node
+        speedRecords.push_back(speed);
+        if (speed > speedLimit)
         {
-            public char value;
-            public Dictionary<char,Node> node = new Dictionary<char,Node>();
-            public bool isendofword;
-            public Node()
-            {
-                
-            }
-            public Node(char va)
-            {
-                this.value= va;
-            }
-            public Node[] getchildren()
-            {
-                return node.Values.ToArray();
-            }
-            public bool check_child(Node node)
-            {
-                return node?.value==null;
-            }
-            public bool has_child()
-            {
-                return node.Count==0;
-            }
-            public void remove_child(char ch)
-            {
-                node.Remove(ch);
-            }
-            public Node getchild(char va)
-            {
-                return node[va];
-            }
+            int fine = calculateFine(speed, speedLimit);
+            std::cout << "Car " << licensePlate << " is fined $" << fine
+                      << ". Speed: " << speed << " km/h (Limit: " << speedLimit << " km/h)" << std::endl;
         }
-        private Node root=new Node(' ');
-        public void insert(string val)
+        else
         {
-            var current=root;
-            foreach (var item in val)
-            {
-                if (!current.node.ContainsKey(item))
-                {
-                    current.node[item]   = new Node(item);
-                }
-                    current = current.node[item];
-            }
-                current.isendofword = true;
-            }
-        public void Preorder()
-        {
-            Preorder(root);
-        }
-        private void Preorder(Node root)
-        {
-            Console.WriteLine(root.value);
-           foreach(var child in root.getchildren())
-            {
-                Preorder(child);
-            }
-        }
-            public bool contain(string ch)
-            {
-            if(ch == null) return false;
-            string word="";
-            var current = root;
-             foreach (var item in ch)
-            {
-                    if (!current.node.ContainsKey(item))
-                    {
-                    Console.WriteLine("match word " + word);
-                    return false;
-                    }
-                     word += item;
-                    current = current.node[item];
-            }
-            Console.WriteLine("match word "+word);
-            return current.isendofword;
-            }
-        public void revmove(string word)
-        {
-            if(word==null) return;
-            remove(root,word,0,new Node());
-        }
-        private void remove(Node root,string word,int count,Node previos)
-        {
-            int i = word.Length-1;
-                foreach (var item in root.getchildren())
-                {
-                if (count != i+1)
-                {
-                    if (item.value == word[count])
-                    {
-                        if (item.isendofword && count == i)
-                        {
-                            item.isendofword = false;
-                            delete(previos);
-                            Console.WriteLine("done");
-                            return ;
-                        }
-                        if (item.isendofword)
-                        {
-                              previos = item;
-                        }
-                        count++;
-                    }
-                }
-                remove(item, word, count,previos);
-            }
-        }
-        private void delete(Node previos)
-        {
-               foreach(var item in previos.getchildren())
-               {
-                delete(item);
-                if (item.node.Count==0 && !item.isendofword)
-                  {
-                    previos.node.Remove(item.value);
-                  }
-               }
-        }
-        public void revove_mosh(string word)
-        {
-            revove_mosh(root, word,0);
-        }
-        private void revove_mosh(Node node,string word,int index)
-        {
-            if(index==word.Length)
-            {
-                node.isendofword=false;
-                return;
-            }
-            var ch = word[index];
-            var child= node.getchild(ch);
-            if(child==null)
-            {
-                return;
-            }
-            revove_mosh(child, word, index + 1);
-            if(node.has_child()&&!node.isendofword)
-            {
-                node.remove_child(ch);
-            }
-        }
-        public void auto_complition(string word)
-        {
-            auto_complition(root, word, new List<string>());
-        }
-        private void auto_complition(Node node,string word,List<string>  words)
-        {
-             foreach(Node node1 in node.getchildren())
-            {
-                if(node1.isendofword)
-                {
-                    words.Add(word);
-                }
-                auto_complition(node1, word, words);
-            }
-        }
-        public void find_word(string ch)
-        {
-            find_word(root,ch,0);
-        }
-        private void find_word(Node root,string ch,int index)
-        {
-            foreach(var item in root.getchildren())
-            {
-                if (item.value == ch[index]&&item.isendofword)
-                {
-                    find_word(item, ch, index);
-                }
-            }
+            std::cout << "Car " << licensePlate << " is within the speed limit. Speed: "
+                      << speed << " km/h (Limit: " << speedLimit << " km/h)" << std::endl;
         }
     }
-    public class Program
-    {
-        static void Main(string[] args)
-        {
 
-            Tries tries = new Tries();
-            tries.insert("pic");
-            tries.insert("picture");
-            tries.insert("pickle");
-            //tries.insert("pictures");
-
-            Console.WriteLine(tries.contain("picture"));
-
-            tries.revove_mosh("picture");
-            Console.WriteLine(tries.contain("picture"));
-            Console.WriteLine(tries.contain("pickle"));
-            //Console.WriteLine(tries.contain("pictures"));
+    void displaySpeedRecords() const {
+        std::cout << "Speed records for car " << licensePlate << ": ";
+        for (int speed : speedRecords) {
+            std::cout << speed << " ";
         }
-
+std::cout << std::endl;
     }
+
+private:
+    std::string licensePlate;
+std::vector<int> speedRecords;
+
+int calculateFine(int speed, int speedLimit)
+{
+    int excessSpeed = speed - speedLimit;
+    return excessSpeed * 10;
 }
+};
 
+int main()
+{
+    const int speedLimit = 60;
+    std::vector<Car> cars;
+    cars.emplace_back("ABC123");
+    cars.emplace_back("XYZ456");
+    std::vector<int> carSpeeds = { 70, 50, 80, 55 };
 
+    for (size_t i = 0; i < cars.size() && i < carSpeeds.size(); ++i)
+    {
+        cars[i].checkSpeed(carSpeeds[i], speedLimit);
+    }
 
-      
+    for (const auto&car : cars) {
+        car.displaySpeedRecords();
+    }
+
+    return 0;
+}
